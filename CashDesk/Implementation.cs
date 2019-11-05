@@ -185,10 +185,14 @@ namespace CashDesk
 
             var statistics = new List<IDepositStatistics>();
 
-            foreach (var member in dataContext.Members)
+            foreach (var member in dataContext?.Members)
             {
-                foreach (var membership in member?.Memberships)
+                if (member.Memberships == null) continue;
+
+                foreach (var membership in member.Memberships)
                 {
+                    if (membership.Deposits == null) continue;
+
                     statistics.Add(new DepositStatistics
                     {
                         Member = member,
