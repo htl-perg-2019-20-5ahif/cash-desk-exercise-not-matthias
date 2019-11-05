@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CashDesk
@@ -178,12 +179,27 @@ namespace CashDesk
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<IDepositStatistics>> GetDepositStatisticsAsync()
+        public async Task<IEnumerable<IDepositStatistics>> GetDepositStatisticsAsync()
         {
             ThrowIfNotInitialized();
 
+            var statistics = new List<IDepositStatistics>();
 
-            return default;
+            foreach (var member in dataContext.Members)
+            {
+                foreach (var membership in member?.Memberships)
+                {
+                    statistics.Add(new DepositStatistics
+                    {
+                        Member = member,
+                        TotalAmount = membership.Deposits.Sum(deposit => deposit.Amount),
+                        Year = membership.Begin.Year
+                    });
+                }
+
+            }
+
+            return statistics;
         }
 
         /// <inheritdoc />
